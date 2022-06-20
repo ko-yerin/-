@@ -1,7 +1,10 @@
-import express from 'express'
+//wallet서버
+import express from 'express' //node js의 라이브러리로 간편하게 웹서버를 구축할수 있게 도와준다
 import nunjucks from 'nunjucks'
 import { Wallet } from './wallet'
 import axios from 'axios'
+//axios
+//백엔드랑 프론트엔드랑 통신을 쉽게하기 위해
 
 const app = express()
 
@@ -20,7 +23,7 @@ const baseAuth = Buffer.from(userid + ':' + userpw).toString('base64')
 const request = axios.create({
     baseURL, //http://localhost:3000를 칠때마다 안치고 default로 깔려있게  그래서 /만 치면됨
     headers: {
-        Authorization: 'Basic' + baseAuth,
+        Authorization: 'Basic ' + baseAuth, //Basic다음  띄어쓰기 해야됨
         'Content-type': 'application/json', //변수명에 -를 사용할수없어서  스트링으로
     },
 })
@@ -29,7 +32,7 @@ app.use(express.json())
 app.set('view engine', 'html')
 nunjucks.configure('views', {
     express: app,
-    watch: true,
+    watch: true, //HTML 파일이 변경될 때에 템플릿 엔진을 reload
 })
 
 app.get('/', (req, res) => {
@@ -43,7 +46,6 @@ app.post('/newWallet', (req, res) => {
 //만들거
 //list
 app.post('/walletList', (req, res) => {
-    console.log('wallet list')
     const list = Wallet.getWalletList()
     res.json(list)
 })
@@ -51,14 +53,31 @@ app.post('/walletList', (req, res) => {
 //view
 app.get('/wallet/:account', (req, res) => {
     const { account } = req.params //파람스?
-    console.log('wallet', account)
-    const privateKey = Wallet.getWalletPrivateKey(account) //private key가져오는거
+    const privateKey = Wallet.getWalletPrivateKey(account) //private key가져오는거,
     res.json(new Wallet(privateKey))
 })
 
 //sendTransaction(글쓰기)
 app.post('/sendTransaction', async (req, res) => {
-    console.log(req.body)
+    console.log('req.body:', req.body)
+
+    // req.body: {
+    //     sender: {
+    //       publicKey: '030224c3601cb70246640b5c8dca9dcc5afdef596fae97a8fbeb2b3f7123bcded2',
+    //       account: 'ca9dcc5afdef596fae97a8fbeb2b3f7123bcded2'
+    //     },
+    //     received: '0e5954ae640884adaead26f399a5af56bd81b057',
+    //     amount: 10
+    //   }
+    //   txObject: {
+    //     sender: '030224c3601cb70246640b5c8dca9dcc5afdef596fae97a8fbeb2b3f7123bcded2',
+    //     received: '0e5954ae640884adaead26f399a5af56bd81b057',
+    //     amount: 10,
+    //     signature: Signature {
+    //       r: BN { negative: 0, words: [Array], length: 10, red: null },
+    //       s: BN { negative: 0, words: [Array], length: 10, red: null },
+    //       recoveryParam: 0
+    //     }
 
     const {
         sender: { account, publicKey },
@@ -77,10 +96,10 @@ app.post('/sendTransaction', async (req, res) => {
         signature,
     }
 
-    console.log(txObject)
+    console.log('txObject:', txObject)
 
-    const response = await request.post('/sendTransaction')
-    console.log(response.data)
+    const response = await request.post('/sendTransaction', txObject)
+    console.log('response.data:', response.data)
     res.json({})
 })
 

@@ -3,7 +3,7 @@ import elliptic from 'elliptic'
 import { SHA256 } from 'crypto-js'
 
 const ec = new elliptic.ec('secp256k1')
-// 저 알고리즘의 결과를 리턴해주는 라이브러리가 있지 않을까?
+// 타원곡선 알고리즘의 결과를 리턴해주는 라이브러리가 있지 않을까?
 // elliptic
 
 describe('지갑 이해하기', () => {

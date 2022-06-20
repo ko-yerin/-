@@ -4,17 +4,15 @@ import { GENESIS } from '@core/config'
 describe('Block 검증', () => {
     // 어차피 제네시스블럭은 하드코딩한 값이야
     let newBlock: Block
-    const genesisBlock: Block = GENESIS
+
     it('블록생성', () => {
         const data = ['Block #2']
         // newBlock = new Block(genesisBlock, data)
-        newBlock = Block.generateBlock(genesisBlock, data)
-        const newBlock2 = new Block(newBlock, data)
-        // console.log('newBlock', newBlock)
-        // console.log('newBlock2', newBlock2)
+        newBlock = Block.generateBlock(GENESIS, data, GENESIS)
     })
+
     it('블록 검증 테스트', () => {
-        const isValidBlock = Block.isValidNewBlock(newBlock, genesisBlock)
+        const isValidBlock = Block.isValidNewBlock(newBlock, GENESIS)
 
         if (isValidBlock.isError) {
             console.error(isValidBlock.error)
@@ -30,5 +28,9 @@ describe('Block 검증', () => {
         //     if (e instanceof Error) console.error(e.message)
         //     expect(false).toBe(true)
         // }
+    })
+
+    it('블록난이도 가져오기 테스트', () => {
+        const data = ['hello world']
     })
 })

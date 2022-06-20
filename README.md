@@ -335,3 +335,5 @@ tx- 블럭들안에 있는 tx의 맨처음내용은 채굴한사람의 거래내
 tx pool
 
 wallet
+
+\*UTXO

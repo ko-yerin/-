@@ -1,5 +1,5 @@
 /*
-    난이도 조정 블록 범위
+    난이도 조정 블록 범위 10개
 */
 export const DIFFICULTY_ADJUSTMENT_INTERVAL: number = 10
 /*
@@ -9,9 +9,9 @@ export const DIFFICULTY_GENERATION_INTERVAL: number = 10
 /*
     생성 시간 단위
 */
-export const BLOCK_GENERATION_TIME: number = 60
+// export const BLOCK_GENERATION_TIME: number = 60
 
-export const UNIT: number = 60
+export const UNIT: number = 60 //unit:단위
 
 // export const GENESIS: IBlock = {
 //     version: '1.0.0',

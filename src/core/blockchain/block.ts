@@ -99,6 +99,7 @@ export class Block extends BlockHeader implements IBlock {
         if (_newBlock.height < 9) return 0
         if (_newBlock.height < 10) return 1
         if (_newBlock.height % DIFFICULTY_GENERATION_INTERVAL !== 0) return _previousBlock.difficulty
+        //나머지가 0이아닐경우 즉  나눴을때 딱떨어지지 않았을경우 true로  리턴
 
         const timeTaken: number = _newBlock.timestamp - _adjustmentBlock.timestamp
 
