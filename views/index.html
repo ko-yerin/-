@@ -1,60 +1,64 @@
 <!DOCTYPE html>
-<html lang='en'>
-<head>
-    <meta charset='UTF-8'>
-    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <title>Wallet😎</title>
-</head>
-<body>
-    <h1>hello world!</h1>
-    <button id="wallet_btn">지갑 생성</button>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <title>Wallet😎</title>
+    </head>
+    <body>
+        <h1>hello world!</h1>
+        <button id="wallet_btn">지갑 생성</button>
 
-    <ul id="wallet_list">
-        <li>Coin : ingCoin</li>
-        <li>account :
-            <span class="account">{{data.account}}</span>
-        </li>
-        <li>private key:
-            <span class="private">{{data.privateKey}}</span>
-        </li>
-        <li>public key :
-            <span class="publicKey">{{data.publicKey}}</span>
-        </li>
-        <li>balance :
-            <span class="balance">{{data.balance}}</span>
-        </li>
-    </ul>
-
-    <h1>Transaction</h1>
-    <form id='transaction_form'>
-        <ul>
+        <ul id="wallet_list">
+            <li>Coin : ingCoin</li>
             <li>
-                To (받는 사람): <input id='to' />
+                account :
+                <span class="account">{{data.account}}</span>
             </li>
             <li>
-                From (보내는 사람): <input id='from' />
+                private key:
+                <span class="private">{{data.privateKey}}</span>
             </li>
             <li>
-                Value (보낼 돈): <input id='value' />
+                public key :
+                <span class="publicKey">{{data.publicKey}}</span>
+            </li>
+            <li>
+                balance :
+                <span class="balance">{{data.balance}}</span>
             </li>
         </ul>
-        <input type='submit' value='전송'/>
-    </form>
-    <script type="text/javascript">
-        const walletBtn = document.querySelector('#wallet_btn')
-        const transactionForm = document.querySelector('#transaction_form')
-        const createWallet = async () => {
-            const response = await axios.post('/newWallet',null)
-            console.log(response.data)
-        }
-        const submitHandler = async(e) => {
-            e.preventDefault()
-            console.log(e.target.to.value)
-            console.log(e.target.from.value)
-            console.log(e.target.value.value)
-        }
-        walletBtn.addEventListener('click',createWallet)
-        transactionForm.addEventListener('submit',submitHandler)
-    </script>
-</body>
+
+        <h1>지갑목록</h1>
+        <div class="wallet_list2">
+            <ul>
+                asd
+            </ul>
+            <form id="transaction_form">
+                <ul>
+                    <li>To (받는 사람): <input id="to" /></li>
+                    <li>From (보내는 사람): <input id="from" /></li>
+                    <li>Value (보낼 돈): <input id="value" /></li>
+                </ul>
+                <input type="submit" value="전송" />
+            </form>
+        </div>
+        <script type="text/javascript">
+            const walletBtn = document.querySelector('#wallet_btn')
+            const transactionForm = document.querySelector('#transaction_form')
+
+            const createWallet = async () => {
+                const response = await axios.post('/newWallet', null)
+                console.log(response.data)
+            }
+            const submitHandler = async (e) => {
+                e.preventDefault()
+                console.log(e.target.to.value)
+                console.log(e.target.from.value)
+                console.log(e.target.value.value)
+            }
+            walletBtn.addEventListener('click', createWallet)
+            transactionForm.addEventListener('submit', submitHandler)
+        </script>
+    </body>
 </html>
