@@ -2,6 +2,7 @@ import { randomBytes } from 'crypto'
 import elliptic from 'elliptic'
 import fs from 'fs' //file system 의 약자
 import path from 'path'
+import { SHA256 } from 'crypto-js'
 
 const dir = path.join(__dirname, '../data') //__dirname이건 머지??
 
@@ -43,6 +44,23 @@ export class Wallet {
         const filepath = path.join(dir, _account)
         const filecontent = fs.readFileSync(filepath) //dir라는 변수에 account값을 합친 file을 가져오는 매서드
         return filecontent.toString()
+    }
+
+    static createSign(_obj: any): elliptic.ec.Signature {
+        const {
+            sender: { account, publicKey },
+            received,
+            amount,
+        } = _obj
+
+        //hash
+        const hash: string = SHA256([publicKey, received, amount].join('')).toString()
+
+        //privateKey
+        const privateKey: string = Wallet.getWalletPrivateKey(account)
+
+        const keyPair: elliptic.ec.KeyPair = ec.keyFromPrivate(privateKey)
+        return keyPair.sign(hash, 'hex')
     }
 
     public getPrivateKey(): string {

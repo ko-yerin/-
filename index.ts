@@ -65,6 +65,11 @@ app.get('/peers', (req, res) => {
     const sockets = ws.getSockets().map((s: any) => s._socket.remoteAddress + ':' + s._socket.remotePort)
     res.json(sockets)
 })
+
+app.post('/sendTransaction', (req, res) => {
+    res.json([])
+})
+
 app.listen(3000, () => {
     console.log('서버시작 3000')
     ws.listen()
