@@ -13,9 +13,11 @@ export class Wallet {
     public publicKey: string
     public balance: number
 
-    constructor() {
+    constructor(_privateKey: string = '') {
+        this.privateKey = _privateKey || this.getPrivateKey()
         //여기가 작동한다라는건 객체를 생성했다 ==개인키를 생성했다
-        this.privateKey = this.getPrivateKey()
+
+        // this.privateKey = this.getPrivateKey()
         this.publicKey = this.getPublicKey()
         this.account = this.getAccount()
         this.balance = 0 //잔액
