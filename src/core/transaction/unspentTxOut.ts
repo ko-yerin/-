@@ -12,6 +12,14 @@ export class unspentTxOut {
     }
 }
 
+// unspentTxOut {
+//     txOutId: '012d7d3b61ad4cefe57c388112bef80eddb9040ef621ac183879dc5f18778c45',
+//     txOutIndex: 0,
+//     account: '062739667c018b24604c86f54e2b63edbabe10ea',
+//     amount: 50
+//   },
+
+//이건아님
 // Transaction {
 //     txIns: [ TxIn { txOutId: '', txOutIndex: 0, signature: undefined } ],
 //     txOuts: [
