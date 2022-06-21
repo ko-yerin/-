@@ -17,9 +17,9 @@ export class Chain {
     public getUnspentTxOuts(): unspentTxOut[] {
         return this.unspentTxOuts
     }
-
-    public appendUTXO(utxo: unspentTxOut): void {
-        this.unspentTxOuts.push(utxo)
+    //                [asdf]
+    public appendUTXO(utxo: unspentTxOut[]): void {
+        this.unspentTxOuts.push(...utxo) //...으로 펼쳐서 넣으면  배열에서 빠져서 asdf로 들감
     }
 
     public getChain(): Block[] {
@@ -34,7 +34,7 @@ export class Chain {
         return this.blockchain[this.blockchain.length - 1]
     }
 
-    public miningBlock(_account: string) {
+    public miningBlock(_account: string): Failable<Block, string> {
         //TODO:Transaction 만드는 코드를 넣고
         //TODO:addBlock
 
@@ -42,6 +42,9 @@ export class Chain {
         const txout: ITxOut = new TxOut(_account, 50)
         const transaction: Transaction = new Transaction([txin], [txout])
         const utxo = transaction.createUTXO()
+        this.appendUTXO(utxo) //[asdf]
+
+        return this.addBlock([transaction])
     }
 
     public addBlock(_data: ITransaction[]): Failable<Block, string> {

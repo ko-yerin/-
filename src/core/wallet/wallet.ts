@@ -56,4 +56,15 @@ export class Wallet {
     getAccount(): string {
         return Buffer.from(this.publickey).slice(26).toString()
     }
+
+    //필요한값:account,unspentTxOut[]
+    static getBalance(_account: string, _UnspentTxOuts: IUnspentTxOut[]): number {
+        return _UnspentTxOuts
+            .filter((v) => {
+                return v.account === _account
+            })
+            .reduce((acc, utxo) => {
+                return (acc += utxo.amount)
+            }, 0)
+    }
 }
