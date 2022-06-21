@@ -34,5 +34,5 @@ export const GENESIS: IBlock = {
     hash: '0'.repeat(64),
     nonce: 0,
     difficulty: 0,
-    data: ['FUCKING AWESOME GENESIS'],
+    data: [],
 }

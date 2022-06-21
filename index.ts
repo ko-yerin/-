@@ -71,7 +71,8 @@ app.get('/chains', (req, res) => {
 //블록채굴하는 api
 app.post('/mineBlock', (req, res) => {
     const { data } = req.body
-    const newBlock = ws.addBlock(data)
+    //트랜잭션 객체를 채우는 정보를 위해 data(account)를 받는다  원래 스트링으로 넣어놓은것을 바꾸기 전역타입으로 만들었다
+    const newBlock = ws.miningBlock(data)
     if (newBlock.isError) return res.status(500).json(newBlock.error)
     //if가 트룽일때  실행하는 코드
     //500에러를 응답해주고 newblock변수안에있는  error스트링을 json타입으로 응답하겠다

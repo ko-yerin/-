@@ -20,9 +20,9 @@ describe('Tracsaction생성', () => {
 
     it('transaction 생성해보기', () => {
         transaction = new Transaction([txin], [txout]) //여기서 unspentTxOut도 생성되는거
-        console.log(transaction)
+        // console.log(transaction)
         const utxo = transaction.createUTXO()
-        console.log('utxo', utxo)
+        // console.log('utxo', utxo)
     })
 })
 

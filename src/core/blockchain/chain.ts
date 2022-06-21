@@ -1,11 +1,25 @@
 import { Block } from '@core/blockchain/block'
 import { DIFFICULTY_ADJUSTMENT_INTERVAL } from '@core/config'
+import { TxIn } from '@core/transaction/txin'
+import { TxOut } from '@core/transaction/txout'
+import { Transaction } from '@core/transaction/transaction'
+import { unspentTxOut } from '@core/transaction/unspentTxOut'
 
 export class Chain {
-    public blockchain: Block[]
+    private blockchain: Block[]
+    private unspentTxOuts: unspentTxOut[]
 
     constructor() {
         this.blockchain = [Block.getGENESIS()]
+        this.unspentTxOuts = []
+    }
+
+    public getUnspentTxOuts(): unspentTxOut[] {
+        return this.unspentTxOuts
+    }
+
+    public appendUTXO(utxo: unspentTxOut): void {
+        this.unspentTxOuts.push(utxo)
     }
 
     public getChain(): Block[] {
@@ -20,7 +34,17 @@ export class Chain {
         return this.blockchain[this.blockchain.length - 1]
     }
 
-    public addBlock(_data: string[]): Failable<Block, string> {
+    public miningBlock(_account: string) {
+        //TODO:Transaction 만드는 코드를 넣고
+        //TODO:addBlock
+
+        const txin: ITxIn = new TxIn('', this.getLatestBlock().height + 1)
+        const txout: ITxOut = new TxOut(_account, 50)
+        const transaction: Transaction = new Transaction([txin], [txout])
+        const utxo = transaction.createUTXO()
+    }
+
+    public addBlock(_data: ITransaction[]): Failable<Block, string> {
         // TODO : 1. 내가 앞으로 생성할 블록의 높이값을 가져올 수 있는가?
         // 현재 높이값 - block interval 햇을때 음수가 나오면, genesisblock 을 보게 만들면 된다.
         // 2. 난이도를 구하기 (difficulty) -> 생성시간이 필요함
@@ -34,6 +58,13 @@ export class Chain {
         this.blockchain.push(newBlock)
         return { isError: false, value: newBlock }
     }
+    //addBlock의 역할은?새로운 블럭을 추가시키는것
+    //근데 새로운블럭을 추가시키기위해서는 이전블럭을 가지고와야됨
+    //이전블럭을 쉽게 가져오기 위해서 그래서 chain에구현되어있다
+    //data값만 넣어주면 알아서다해줬다
+    //근데 우리가 data를 스트링으로 넣어놨는데  이젠 트랜잭션을 넣어야됨
+    //그래서 addblock전에  마이닝블럭 호출하고 그안에서 addblock호출시키자
+    //그런데 마이닝블럭안에서 데이터값(트랜잭션)필요하니까 그거만드는것도 마이닝블럭안에서
 
     public addToChain(_receivedBlock: Block): Failable<undefined, string> {
         const isValid = Block.isValidNewBlock(_receivedBlock, this.getLatestBlock())

@@ -3,7 +3,7 @@ declare interface IBlock extends IBlockHeader {
     hash: string
     nonce: number
     difficulty: number
-    data: string[]
+    data: ITransaction[]
 }
 
 declare interface IBlockHeader {
