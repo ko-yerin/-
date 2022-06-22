@@ -126,7 +126,6 @@ app.post('/sendTransaction', (req, res) => {
     // Wallet.sendTransaction()
     try {
         const receivedTx: ReceivedTx = req.body //에러가 없을경우 실행
-
         //  ReceivedTx는  core/wallet/wallet.ts 에서 적어준  interface 이름
         //@types는  전역으로 속성을 관리해주는 곳으로 앞에 declare를  붙여준다
         //그럼 import로 가지고 오지 않아도 사용가능
@@ -145,7 +144,7 @@ app.post('/sendTransaction', (req, res) => {
          * }
          */
 
-        Wallet.sendTransaction(receivedTx)
+        Wallet.sendTransaction(receivedTx, ws.getUnspentTxOuts())
     } catch (e) {
         if (e instanceof Error) console.log(e.message) //에러가 있을경우실행
         //에러중에서도 발생한 에러가 e instanceof Error 이거면   콘솔로 찍어라

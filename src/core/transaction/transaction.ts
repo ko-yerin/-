@@ -1,4 +1,3 @@
-import { Sign } from 'crypto'
 import { SHA256 } from 'crypto-js'
 import { TxIn } from './txin'
 import { TxOut } from './txout'
@@ -46,5 +45,20 @@ export class Transaction {
         return this.txOuts.map((txout: TxOut, index: number) => {
             return new unspentTxOut(this.hash, index, txout.account, txout.amount)
         })
+    }
+
+    static creataTransaction(_receivedTx: any, myUTXO: unspentTxOut[]): Transaction {
+        //TODO:_receivedTx: any부분수정
+        //객체를 만드는 역할이니  this만들기전 실행되야되니 static
+        //TODO:utxo--->본인에 해당하는 utxo만 있어도 됨
+        //utxo-->txin을 만듬[]
+        const { sum, txins } = TxIn.createTxIns(_receivedTx, myUTXO)
+
+        //txin-->txout을 만듬[]//createTxOuts
+        const txouts: TxOut[] = TxOut.createTxOuts(sum, _receivedTx)
+        const tx = new Transaction(txins, txouts)
+        console.log('tx', tx)
+
+        return tx
     }
 }

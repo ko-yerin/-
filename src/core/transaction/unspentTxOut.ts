@@ -10,6 +10,11 @@ export class unspentTxOut {
         this.account = _account
         this.amount = _amount
     }
+
+    static getMyUnspentTxOuts(_account: string, unspentTxOuts: unspentTxOut[]): unspentTxOut[] {
+        //전체 UTXO, account
+        return unspentTxOuts.filter((utxo: unspentTxOut) => utxo.account === _account)
+    }
 }
 
 // unspentTxOut {

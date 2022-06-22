@@ -11,4 +11,23 @@ export class TxIn {
         this.txOutIndex = _txOutIndex
         this.signature = _signature
     }
+
+    static createTxIns(_receivedTx: any, myUTXO: IUnspentTxOut[]) {
+        let sum = 0
+        let txins: TxIn[] = []
+        for (let i = 0; i < myUTXO.length; i++) {
+            //101010있음  ,보낼금액을 19라고 침
+            const { txOutId, txOutIndex, amount } = myUTXO[i]
+            const item: TxIn = new TxIn(txOutId, txOutIndex, _receivedTx.signature)
+            txins.push(item)
+
+            sum += amount
+            if (sum >= _receivedTx.amount) return { sum, txins }
+        }
+        //위랑 같은거
+        // for(const utxo of myUTXO){
+
+        // }
+        return { sum, txins }
+    }
 }

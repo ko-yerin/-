@@ -2,31 +2,39 @@ import { Chain } from '@core/blockchain/chain'
 import { Wallet } from '@core/wallet/wallet'
 
 describe('Chain 함수 체크', () => {
-    let node: Chain = new Chain()
+    let ws: Chain = new Chain()
 
+    let receivedTx = {
+        sender: '03177913a4efcb4593a1889a6b0e5954ae640884adaead26f399a5af56bd81b057',
+        received: '062739667c018b24604c86f54e2b63edbabe10ea',
+        amount: 10,
+        signature: {
+            r: 'b8f9080f7d8e9a32b95cbd74955f8642ce1bf9bae9e2f2bc48ef42c418d6da9',
+            s: 'cf449fc62a0319739a42e7b7adbdeb580aaa47356be39379514c87298073df83',
+            recoveryParam: 0,
+        },
+    }
     it('getChain() 함수 체크', () => {
-        console.log(node.getChain())
+        console.log(ws.getChain())
     })
     it('getLength() 함수 체크', () => {
-        console.log(node.getLength())
+        console.log(ws.getLength())
     })
     it('getLatestBlock() 함수 체크', () => {
-        console.log(node.getLatestBlock())
+        console.log(ws.getLatestBlock())
     })
     it('addBlock() 함수 체크', () => {
         // for (let i = 1; i <= 10; i++) {
-        //     node.miningBlock('062739667c018b24604c86f54e2b63edbabe10ea')
+        //     ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
         //     //addBlock 의 역할이  현높이가 2일때  2번쨰 블럭을 가지고 오고 . 높이 3짜리 블럭을 만들떄
         //     //돌아가는 매서드임
         // }
-        node.miningBlock('062739667c018b24604c86f54e2b63edbabe10ea')
-        node.miningBlock('062739667c018b24604c86f54e2b63edbabe10ea')
-        node.miningBlock('062739667c018b24604c86f54e2b63edbabe10ea')
-        node.miningBlock('062739667c018b24604c86f54e2b63edbabe1234')
-        node.miningBlock('062739667c018b24604c86f54e2b63edbabe1234')
-        node.miningBlock('062739667c018b24604c86f54e2b63edbabe1234')
-        // console.log(node.getChain())
-        console.log(node.getUnspentTxOuts())
+        ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
+        ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
+        ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
+
+        // console.log(ws.getChain())
+        console.log(ws.getUnspentTxOuts())
 
         //마이닝블럭 매개변수에 22번쨰부터 27번쨰꺼까지의 account를 인자로 넣어줘서 그걸돌려서 나온값들이다
         //이값들은  getUnspentTxOuts()에 들어가 있다
@@ -34,19 +42,19 @@ describe('Chain 함수 체크', () => {
         //     unspentTxOut {
         //       txOutId: '012d7d3b61ad4cefe57c388112bef80eddb9040ef621ac183879dc5f18778c45',
         //       txOutIndex: 0,
-        //       account: '062739667c018b24604c86f54e2b63edbabe10ea',
+        //       account: '0e5954ae640884adaead26f399a5af56bd81b057',
         //       amount: 50
         //     },
         //     unspentTxOut {
         //       txOutId: '63a394943b73f040aee94dd9502241b6394de82b3aba38dda39af7b2937ef526',
         //       txOutIndex: 0,
-        //       account: '062739667c018b24604c86f54e2b63edbabe10ea',
+        //       account: '0e5954ae640884adaead26f399a5af56bd81b057',
         //       amount: 50
         //     },
         //     unspentTxOut {
         //       txOutId: 'dad9877c63a29c016e699e67f9f845ddd16d6abf9254dceab7c93eff7c5e514f',
         //       txOutIndex: 0,
-        //       account: '062739667c018b24604c86f54e2b63edbabe10ea',
+        //       account: '0e5954ae640884adaead26f399a5af56bd81b057',
         //       amount: 50
         //     },
         //     unspentTxOut {
@@ -69,8 +77,36 @@ describe('Chain 함수 체크', () => {
         //     }
         //   ]
         console.log(
-            '062739667c018b24604c86f54e2b63edbabe10ea 총금액:',
-            Wallet.getBalance('062739667c018b24604c86f54e2b63edbabe10ea', node.getUnspentTxOuts()),
+            '0e5954ae640884adaead26f399a5af56bd81b057 총금액:',
+            Wallet.getBalance('0e5954ae640884adaead26f399a5af56bd81b057', ws.getUnspentTxOuts()),
         )
+    })
+
+    it('sendTransaction 검증', () => {
+        try {
+            const tx = Wallet.sendTransaction(receivedTx, ws.getUnspentTxOuts())
+            console.log('tx', tx)
+            //Transaction 내용을 가지고 UTXO최신화하기   .updateUTXO
+        } catch (e) {
+            if (e instanceof Error) console.log(e.message)
+        }
+    })
+
+    it('트랜잭션검증', () => {
+        //TODO:지갑->서명을 확인하고 block Server로 데이터를 전달받아야되고
+        //받은걸 가지고 UTXO에서 내용을 가지고 와서 현재 보내는 사람의 계정에 돈이 있는지 확인하고
+        //트랜잭션을 만들어야된다
+        //1.보내는  사람의 금액에 맞는 UTXO를 찾는 과정
+        //2.TxIn만드는 과정
+        //3.TxOut 만드는 과정
+        //받는사람
+        //보낼계정:ㅁㅇㅁㄴㅇㄹ
+        //보낼금액:0.5
+        //라는 객체를 만들수 있게끔
+        //잔돈을 돌려받는 사람
+        //보낼계정:인구     -----보내는 사람의 계정
+        //보낼금액 :0.5     ----보낸금액-보낼양
+        //트랜잭션이 발동이 되려면 어디서 부터 시작?
+        //-->지갑(시작시점)--->sendTransaction()
     })
 })

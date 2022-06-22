@@ -96,6 +96,34 @@ export class Chain {
         return { isError: false, value: undefined }
     }
 
+    updateUTXO(_tx: Transaction) {
+        // const consumedTxOuts = tx.txIns
+        // const newUnspentTxOuts = tx.txOuts
+        // const unspentTxOuts: unspentTxOut[] = this.getUnspentTxOuts()
+
+        // let newUTXO = unspentTxOuts
+        // consumedTxOuts.forEach((txin: TxIn) => {
+        //     newUTXO = newUTXO.filter((utxo: unspentTxOut) => {
+        //         return txin.txOutId !== utxo.txOutId && txin.txOutIndex !== utxo.txOutIndex
+        //     })
+        // })
+
+        const consumedTxOuts = _tx.txIns
+        const newUnspentTxOuts = _tx.txOuts
+
+        let utxo = this.getUnspentTxOuts()
+
+        consumedTxOuts.reduce((acc: unspentTxOut[], _v) => {
+            utxo = acc.filter((v) => {
+                return v.txOutId !== _v.txOutId
+            })
+
+            return utxo
+        }, utxo)
+
+        return utxo
+    }
+
     replaceChain(_receivedChain: Block[]): Failable<undefined, string> {
         // 내 체인과 상대체인에 대해 검사
         // 2. 받은체인의 이전해시값 === 내 체인의 해시값

@@ -7,7 +7,7 @@
 //     signature?: any //?를 써주면  signature 속성을 사용해도 되고 안해도된다
 // }
 
-// interface ITxOut {
+// interface ITxOut {  //만들려면 TxIn을알야애됨  반환받을 돈을 알기위해
 //     //출금내역, 잔액
 //     account: string //받는 사람의 주소(인구)
 //     amount: number //받을양(1000)

@@ -1,4 +1,6 @@
 //여기 wallet은  검증의 용도
+import { Transaction } from '@core/transaction/transaction'
+import { unspentTxOut } from '@core/transaction/unspentTxOut'
 import { SHA256 } from 'crypto-js'
 import elliptic from 'elliptic'
 
@@ -18,14 +20,15 @@ export class Wallet {
     public balance: number
     public signature: Signature
 
-    constructor(_sender: string, _signature: Signature) {
+    constructor(_sender: string, _signature: Signature, unspentTxOuts: unspentTxOut[]) {
         this.publickey = _sender
-        this.account = this.getAccount()
-        this.balance = 0
+        this.account = Wallet.getAccount(this.publickey)
+        this.balance = Wallet.getBalance(this.account, unspentTxOuts)
         this.signature = _signature
     }
 
-    static sendTransaction(_receivedTx: ReceivedTx) {
+    static sendTransaction(_receivedTx: any, unspentTxOuts: unspentTxOut[]) {
+        //TODO:완성후 __receivedTx: any부분 수정하기
         //TODO:서명검증
 
         //공개키,보내는 사람:공개키, 받느사람:계정,보낼금액
@@ -35,9 +38,16 @@ export class Wallet {
         console.log(verify.isError) //false
 
         //TODO:보내는 사람의 지갑정보 최신화 //publicKey
-        const myWallet = new this(_receivedTx.sender, _receivedTx.signature)
-        //TODO:balance(잔액)  확인
-        //TODO:transaction만드는 과정
+        const myWallet = new this(_receivedTx.sender, _receivedTx.signature, unspentTxOuts)
+        //TODO:Balance(잔액)  확인
+        if (myWallet.balance < _receivedTx.amount) throw new Error('잔액이 모자랍니다')
+        //나의 지갑의 잔액이 보낼양보다 크면 되는거
+        //TODO:transaction만드는 과정   createTransacton()
+        const myUTXO: unspentTxOut[] = unspentTxOut.getMyUnspentTxOuts(myWallet.account, unspentTxOuts)
+
+        const tx: Transaction = Transaction.creataTransaction(_receivedTx, myUTXO)
+
+        return tx
     }
 
     static getVerify(_receivedTx: ReceivedTx): Failable<undefined, string> {
@@ -53,8 +63,8 @@ export class Wallet {
         return { isError: false, value: undefined }
     }
 
-    getAccount(): string {
-        return Buffer.from(this.publickey).slice(26).toString()
+    static getAccount(publicKey: string): string {
+        return Buffer.from(publicKey).slice(26).toString()
     }
 
     //필요한값:account,unspentTxOut[]
@@ -90,7 +100,7 @@ const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     );
 
 
-/***배열 매서드 reduce
+/***배열 매서드 reduce(누적한다)
 
 첫 번째 인자로 콜백함수가 들어오고, (생략가능한) 두 번째 인자는 콜백의 첫 호출에서 accumulator값으로 적용될 값입니다.
 그럼 2번쨰 인자값을  0으로 정해주면  v=0, k=0번쨰 인덱스값,   1로 정해주면  v=1,  k=0번쨰 인덱스값이 된다
@@ -126,7 +136,7 @@ const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     );
 
 
-***배열 매서드 map
+***배열 매서드 map(맵핑, 매치해준다)
  배열의 길이를 유지하면서 기존의 배열을 활용한 새로운 배열을 만드는데 유용한 메서드
 
 let arr = [1, 2, 3, 4, 5]
