@@ -5,13 +5,13 @@ describe('Chain 함수 체크', () => {
     let ws: Chain = new Chain()
 
     let receivedTx = {
-        sender: '03177913a4efcb4593a1889a6b0e5954ae640884adaead26f399a5af56bd81b057',
+        sender: '02639e7d159c47211bc81fd33f03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6',
         received: '03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6',
-        amount: 30,
+        amount: 100,
         signature: {
-            r: '1f918f8df4fc910ab1bcbe98ba8e624e2160ae97b590ae2ef59d5275962a0f7c',
-            s: '93cf60ed3ed79192e24ef496fdb0e55c59801f36f1812fc1e41673d1f0ea35d',
-            recoveryParam: 1,
+            r: 'c393e9070b35236dff4fedbca42a9c13c8d913695b71802013e1963acbbd6890',
+            s: '7381dd2aa530c64f0560e14c53c18394fee39f6a96abfb2d19502cf6cd664815',
+            recoveryParam: 0,
         },
     }
 
@@ -91,10 +91,10 @@ describe('Chain 함수 체크', () => {
             const tx = Wallet.sendTransaction(receivedTx, ws.getUnspentTxOuts())
             // console.log('tx', tx)
             //Transaction 내용을 가지고 UTXO최신화하기   .updateUTXO
-            console.log('utxo내용:', ws.getUnspentTxOuts()) //원래내용 //6
+            console.log('utxo내용:', ws.getUnspentTxOuts()) //원래내용 //6(50)
             ws.appendTransactionPool(tx)
-            ws.updateUTXO(tx) //7
-            console.log('utxo바뀐내용:', ws.getUnspentTxOuts()) //바뀐내용  //7
+            ws.updateUTXO(tx) //이함수에서 -50 +20,30 해주니까 7개찍히고
+            console.log('utxo바뀐내용:', ws.getUnspentTxOuts()) //바뀐내용  //7(-50,+20,+30)
             console.log('pool', ws.getTransactionPool())
         } catch (e) {
             if (e instanceof Error) console.log(e.message)

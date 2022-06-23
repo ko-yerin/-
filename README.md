@@ -557,6 +557,8 @@ utxo에 담긴 a계정사람에 대한걸 쫙모은다
 
 -   마이닝되어야 거래내역이 생기고 utxo도 추가되는거
 -   balance=총액(wallet.ts)
+-   비트코인은 풀에 쌓는 트랜잭션이 10분단위
+    이더리움은 숫자단위
 
 ---
 
@@ -611,7 +613,7 @@ return (v += k); // v = v + k
 }, 0), // default option
 );
 
-\*\*\*배열 매서드 map(맵핑, 매치해준다)
+\*\*\*배열 map(맵핑, 매치해준다) 매서드
 배열의 길이를 유지하면서 기존의 배열을 활용한 새로운 배열을 만드는데 유용한 메서드
 
 let arr = [1, 2, 3, 4, 5]
@@ -641,16 +643,71 @@ console.log(arr.join('-'));
 
 \*\*배열 push매서드
 
-push()메소드는 배열 끝에 요소를 추가하는 데 사용됩니다
+push()메서드는 배열 끝에 요소를 추가하는 데 사용됩니다
 
 const arr =[1,2,3];
 const arr2 = [8,9,10];
-arr.push(4);// single item //1234
-arr.push(5,6,7);// multiple items //1234567
-arr.push(...arr2);// spread operator  
-//배열에 담겨있으니 ...으로 구조분해할당을해서 배여ㅕㄹ에서 꺼내서 넣어준다
+arr.push(4);// single item //arr=1234
+arr.push(5,6,7);// multiple items //arr=1234567
+arr.push(...arr2);// spread operator //arr=12345678910
+//배열에 담겨있으니 ...으로 구조분해할당을해서 배열에서 꺼내서 넣어준다
 //12345678910
 console.log(arr); //12345678910
+
+//
+const arr = [1, 2, 3]
+const arr2 = arr.push(4, 5)  
+console.log(arr)//[1,2,3,4,5] ---push매서드는 다른곳에 안담아줘도 바로 배열에 추가됨
+console.log(arr2)//5 -------push매서드는 다른곳에 담아주게되면 length값이 뜬다
+
+\*\*배열 concat매서드
+
+const myArr = [1, 2, 3];
+
+console.log(myArr.concat(4, 5)); // [1, 2, 3, 4, 5]
+console.log(myArr.concat('육', '칠')); // [1, 2, 3, '육', '칠']
+console.log(myArr.concat(true, false)); // [1, 2, 3, true, false]
+console.log(myArr.concat({name: 'bigtop'})); // [1, 2, 3, {...}]
+
+\*\*concat과 push의 차이
+
+-push에 배열을 통쨰로 넣음
+const arr = [1, 2, 3]
+const arr2 = [4, 5]
+
+arr.push(arr2) //[ 1, 2, 3, [ 4, 5 ] ]
+console.log(arr)
+
+-push에 배열에서 데이터만 꺼내서 넣음
+const arr3 = [1, 2, 3]
+const arr4 = [4, 5]
+arr3.push(...arr4) //[ 1, 2, 3, 4, 5 ]
+console.log(arr3)
+
+const arr1 = [1, 2, 3]
+const arr2 = [4, 5]
+console.log(arr1.concat(arr2)) //[ 1, 2, 3, 4, 5 ]
+
+const arr1 = [1, 2, 3]
+const arr2 = [4, 5]
+console.log(arr1.concat(...arr2)) //[ 1, 2, 3, 4, 5 ]
+
+1.push는 원래있던 배열에 마지막 요소로 데이터를 추가해서 기존배열을 변형
+concat은 slice처럼 기존배열에 아무런 영향을 주지않고 새로운 배열을 만들어준다
+아무런 값도 전달하지 않을 경우에는 이 부분도 slice와 마찬가지로 기존의 배열 전체가 그대로 반환된다.
+사실 concat메서드는 배열에 값을 추가하는 용도보다는 주로 배열과 배열을 합치는데 사용된다.
+
+2.원본 배열이 변환되도 상관 없는 경우에는 push() 함수를 사용하는 것이 더 나을수도 있다.
+하지만 원본의 배열을 그대로 유지하면서 새로운 요소가 포함되는 배열을 만드는 경우에는 concat() 함수를 사용하는것이 좋다.
+
+\*\*\*배열 find매서드
+
+const arr = [1, 2, 4, 8, 20, 30]
+
+return console.log(arr.find((v) => v > 10)) //20
+//???왜30은 반환을 안할까
+//find메소드는 주어진 매서드를 만족하는 첫번쨰 요소의 값을 반환한다
+//만약 만족하는 요소가 없다면 undefinde를 반환한다
 
 \*\*string repeat매서드
 
@@ -666,14 +723,10 @@ console.log(string2)
 console.log('123'.repeat(10))
 //123123123123123123123123123123
 
+\***\*\*\*\*\*\***원래배열에 추가만해주는 매서드는 새로 안담아줘도 되지만
+새로배열을 생성하는건 담아줘야 적용이 된다**\*\*\*\***\*\*\***\*\*\*\***
 \*/
-비트코인은 풀에 쌓는 트랜잭션이 10분단위
-이더리움은 숫자단위
-.concat
-배열 .find
+
 if문 break;
 const,let
 파람스
-
-체인 test.ts콘솔
-잔액 부적 ,50 6개,3000

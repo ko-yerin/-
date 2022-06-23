@@ -161,21 +161,31 @@ export class Chain {
         //         return txin.txOutId !== utxo.txOutId && txin.txOutIndex !== utxo.txOutIndex
         //     })
         // })
-        const unspentTxOuts: unspentTxOut[] = this.getUnspentTxOuts()
+        const latestUTXO: unspentTxOut[] = this.getUnspentTxOuts() //가장최근까지의 UTXO모음(30,20이 안들가고 50도아직안쓴)
         const newUnspentTxOuts = _tx.txOuts.map((txout, index) => {
+            //거래로인해 발생한 새로운 UTXO(30,20)
             return new unspentTxOut(_tx.hash, index, txout.account, txout.amount)
         })
 
-        this.unspentTxOuts = unspentTxOuts
+        this.unspentTxOuts = latestUTXO //이제 50을뺴고 30,20을 넣어주어야된다
             .filter((utxo: unspentTxOut) => {
-                const bool = _tx.txIns.find((txIn: TxIn) => {
+                const isSameUTXO = _tx.txIns.find((txIn: TxIn) => {
                     return utxo.txOutId === txIn.txOutId && utxo.txOutIndex === txIn.txOutIndex
-                })
-                return !bool //없는건  true, 있는건  false로 반환됨
+                }) //utxo에있는  id, index/txin에 있는 id,index가 같은건 utxo에있는게 사용되었기때문에
+                //UTXO에서 삭제되어야됨
+                //그래서 여기코드에서 같은걸 찾음 즉 50
+                //그걸  isSameUTXO변수로 지정해줌
+                return !isSameUTXO
+                //그거와 반대되는값(50을 뺀나머지값)을 필터로 걸러서 다시 배열로 지정
             })
-            .concat(newUnspentTxOuts) //배열매서드
+            .concat(newUnspentTxOuts) //배열매서드//그값에서 concat매서드를 사용해서 원래배열에
+        //newUnspentTxOuts 변수로 정한 배열을 합쳐주었다  즉  20.30을 넣어주었다
 
-        this.appendTransactionPool(_tx) //트랜잭션풀과 utxo는  밀접한 관련이 있다  왜냐 트랜잭션이 생기면 utxo내용도 바뀌기 때문
+        //*173번쨰 코드를 보면 전부찾아야 되는데 find로 찾으면  만족하는 맨 첫번쨰만 찾아지는 데 어쩌냐
+        //filter로 게속 전부찾을 떄까지 돌리니까 상관없다
+
+        this.appendTransactionPool(_tx) //위에 새로운 거래내역이 생기고 utxo가 생기고 그 거래내역이  transaction pool에 추가됨
+        //트랜잭션풀과 utxo는  밀접한 관련이 있다  왜냐 트랜잭션이 생기면 utxo내용도 바뀌기 때문
     }
 
     replaceChain(_receivedChain: Block[]): Failable<undefined, string> {
