@@ -673,6 +673,7 @@ console.log('123'.repeat(10))
 배열 .find
 if문 break;
 const,let
+파람스
 
 체인 test.ts콘솔
 잔액 부적 ,50 6개,3000

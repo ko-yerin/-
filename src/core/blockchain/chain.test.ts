@@ -105,9 +105,9 @@ describe('Chain 함수 체크', () => {
         try {
             //마이닝전 TxPool :1개
             ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
-            console.log(ws.getTransactionPool()) // //마이닝전 TxPool :0개
-            console.log(ws.getChain()) //block 7개
-            console.log(ws.getChain()[6]) //block data->transaction 2개
+            console.log('0', ws.getTransactionPool()) // //마이닝전 TxPool :0개
+            console.log('7', ws.getChain()) //block 7개
+            console.log('2', ws.getChain()[6]) //block data->transaction 2개
         } catch (e) {}
     })
 

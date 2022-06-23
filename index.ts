@@ -4,6 +4,7 @@ import { P2PServer, Message, MessageType } from './src/serve/p2p'
 import peers from './peer.json'
 import express from 'express' //node js의 라이브러리로 간편하게 웹서버를 구축할수 있게 도와준다
 import { ReceivedTx, Wallet } from '@core/wallet/wallet'
+import { ppid } from 'process'
 
 //*from 뒤 스트링은 node_modules 에 설치된 (package.json에 적힌) 라이브러리,import 뒤는 원하는 라이브러리  */
 //(express 라이브러리를 가져올건데  'expres'에서 가져오겟다)
@@ -116,6 +117,18 @@ app.get('/peers', (req, res) => {
     res.json(sockets)
 })
 
+app.post('/getBalance', (req, res) => {
+    //balance값을 알고싶을떄 account만 알면됨
+    const { account } = req.body
+
+    const balance = Wallet.getBalance(account, ws.getUnspentTxOuts())
+    console.log('balance', balance)
+
+    res.json({
+        balance,
+    })
+})
+
 app.post('/sendTransaction', (req, res) => {
     console.log('req.body:', req.body)
     // req.body: {
@@ -132,6 +145,7 @@ app.post('/sendTransaction', (req, res) => {
     // Wallet.sendTransaction()
     try {
         const receivedTx: ReceivedTx = req.body //에러가 없을경우 실행
+        console.log(receivedTx)
         //  ReceivedTx는  core/wallet/wallet.ts 에서 적어준  interface 이름
         //@types는  전역으로 속성을 관리해주는 곳으로 앞에 declare를  붙여준다
         //그럼 import로 가지고 오지 않아도 사용가능
@@ -150,12 +164,22 @@ app.post('/sendTransaction', (req, res) => {
          * }
          */
 
-        Wallet.sendTransaction(receivedTx, ws.getUnspentTxOuts())
+        const tx = Wallet.sendTransaction(receivedTx, ws.getUnspentTxOuts())
+        ws.appendTransactionPool(tx)
+        ws.updateUTXO(tx)
     } catch (e) {
         if (e instanceof Error) console.log(e.message) //에러가 있을경우실행
         //에러중에서도 발생한 에러가 e instanceof Error 이거면   콘솔로 찍어라
     }
     res.json([]) //json형태로 응답을 한다 {key:value}
+})
+
+app.get('/transaction_pool', (req, res) => {
+    res.send(ws.getTransactionPool())
+})
+
+app.get('/unspentTransaction', (req, res) => {
+    res.send(ws.getUnspentTxOuts())
 })
 
 app.listen(3000, () => {

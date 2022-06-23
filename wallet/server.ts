@@ -51,10 +51,15 @@ app.post('/walletList', (req, res) => {
 })
 
 //view
-app.get('/wallet/:account', (req, res) => {
+app.get('/wallet/:account', async (req, res) => {
     const { account } = req.params //파람스?
     const privateKey = Wallet.getWalletPrivateKey(account) //private key가져오는거,
-    res.json(new Wallet(privateKey))
+    const myWallet = new Wallet(privateKey)
+
+    const response = await request.post('/getBalance', { account })
+    console.log('바란스', response.data.balance)
+    myWallet.balance = response.data.balance
+    res.json(myWallet)
 })
 
 //sendTransaction(글쓰기)
