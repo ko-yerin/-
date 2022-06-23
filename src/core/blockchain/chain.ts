@@ -44,18 +44,51 @@ export class Chain {
         this.transactionPool.push(_Transaction)
     }
 
+    public updateTransactionPool(_newBlock: IBlock): void {
+        //상태만 변하는 코드라 리턴값은 없어서 :void
+        let txPool: ITransaction[] = this.getTransactionPool()
+        _newBlock.data.forEach((tx: ITransaction) => {
+            txPool = txPool.filter((txp) => {
+                txp.hash !== tx.hash
+            })
+        })
+
+        this.transactionPool = txPool
+
+        // for (const tx of txPool) {
+        //     for (const txin of tx.txIns) {
+        //         const foundTxIn = this.unspentTxOuts.find((utxo: unspentTxOut) => {
+        //             return utxo.txOutId === txin.txOutId && utxo.txOutIndex === txin.txOutIndex
+        //         })
+
+        //         if (!foundTxIn) {
+        //             this.transactionPool = this.transactionPool.filter((_tx) => {
+        //                 return JSON.stringify(_tx) !== JSON.stringify(tx)
+        //             })
+        //             break
+        //         }
+        //     }
+        // }
+
+        // for (const tx of txPool) {}
+
+        //위코드와 같은 근데 아래는 중간에 멈출수 없고 위는 멈출수 있따
+        // txPool.forEach(tx=>{
+        // })
+    }
+
     public miningBlock(_account: string): Failable<Block, string> {
         //TODO:Transaction 만드는 코드를 넣고
         //TODO:addBlock
 
         const txin: ITxIn = new TxIn('', this.getLatestBlock().height + 1)
         const txout: ITxOut = new TxOut(_account, 50)
-        const transaction: Transaction = new Transaction([txin], [txout])
+        const transaction: Transaction = new Transaction([txin], [txout]) //여기까지가 코인베이스 내용
         const utxo = transaction.createUTXO()
         this.appendUTXO(utxo) //마이닝되어야 거래내역이 생기는건데
         //여기서 이코드를 실행하면  마이닝을 시도하면 거래내역이 생김
 
-        return this.addBlock([transaction])
+        return this.addBlock([transaction, ...this.getTransactionPool()])
     }
 
     public addBlock(_data: ITransaction[]): Failable<Block, string> {
@@ -70,6 +103,11 @@ export class Chain {
         if (isValid.isError) return { isError: true, error: isValid.error }
 
         this.blockchain.push(newBlock)
+        this.updateTransactionPool(newBlock)
+
+        //block.data.transactions  블럭안에 데이터안에 트랜잭션내용들과
+        //transactionpool  내가 가지고 있는 트랜잭션풀과 똑같은 것들을 뺴야된다 즉 트랜잭션 풀의 내용을 최신화해야된다
+        //이게 조금 어려움 이걸 처리하는 매서드를 updateTransactionPool()이라고 하겠다
         return { isError: false, value: newBlock }
     }
     //addBlock의 역할은?새로운 블럭을 추가시키는것
@@ -82,15 +120,20 @@ export class Chain {
 
     public addToChain(_receivedBlock: Block): Failable<undefined, string> {
         const isValid = Block.isValidNewBlock(_receivedBlock, this.getLatestBlock())
-        console.log('fff', _receivedBlock)
-        console.log('ggg', this.getLatestBlock())
+        // console.log('fff', _receivedBlock)
+        // console.log('ggg', this.getLatestBlock())
         if (isValid.isError) {
-            console.log('안됨;')
-            console.log(isValid.error)
+            // console.log('안됨;')
+            // console.log(isValid.error)
             return { isError: true, error: isValid.error }
         }
-        console.log('됨')
+        // console.log('됨')
         this.blockchain.push(_receivedBlock)
+
+        _receivedBlock.data.forEach((tx) => {
+            this.updateUTXO(tx)
+        })
+        this.updateTransactionPool(_receivedBlock)
         return { isError: false, value: undefined }
     }
 
@@ -107,7 +150,7 @@ export class Chain {
         return { isError: false, value: undefined }
     }
 
-    updateUTXO(_tx: Transaction): void {
+    updateUTXO(_tx: ITransaction): void {
         // const consumedTxOuts = tx.txIns
         // const newUnspentTxOuts = tx.txOuts
         // const unspentTxOuts: unspentTxOut[] = this.getUnspentTxOuts()
@@ -157,6 +200,16 @@ export class Chain {
 
         // 체인을 바꿔주는 코드를 작성하면됨.
         this.blockchain = _receivedChain
+
+        //UTXO
+
+        //POOL
+        this.blockchain.forEach((_block: IBlock) => {
+            this.updateTransactionPool(_block)
+            _block.data.forEach((_tx) => {
+                this.updateUTXO(_tx)
+            })
+        })
 
         return { isError: false, value: undefined }
     }

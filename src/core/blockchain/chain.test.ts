@@ -92,12 +92,23 @@ describe('Chain 함수 체크', () => {
             // console.log('tx', tx)
             //Transaction 내용을 가지고 UTXO최신화하기   .updateUTXO
             console.log('utxo내용:', ws.getUnspentTxOuts()) //원래내용 //6
-            ws.updateUTXO(tx)
             ws.appendTransactionPool(tx)
+            ws.updateUTXO(tx) //7
             console.log('utxo바뀐내용:', ws.getUnspentTxOuts()) //바뀐내용  //7
+            console.log('pool', ws.getTransactionPool())
         } catch (e) {
             if (e instanceof Error) console.log(e.message)
         }
+    })
+
+    it('채굴테스트', () => {
+        try {
+            //마이닝전 TxPool :1개
+            ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
+            console.log(ws.getTransactionPool()) // //마이닝전 TxPool :0개
+            console.log(ws.getChain()) //block 7개
+            console.log(ws.getChain()[6]) //block data->transaction 2개
+        } catch (e) {}
     })
 
     it('트랜잭션검증', () => {
