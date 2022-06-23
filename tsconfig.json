@@ -1,19 +1,21 @@
 {
-  "compilerOptions": {
-    "outDir": "./dist/",
-    "esModuleInterop": true, // import React from 'react
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "strict": true,
-    "baseUrl": ".",
-    "typeRoots": ["./node_modules/@types", "./@types"],
-    "paths": {
-      "@core/*": ["src/core/*"],
-      "*": ["@types/*"]
+    "compilerOptions": {
+        "outDir": "./dist/", //밑에index.js바로생기는게 싫어서 여기에 따로 생성되게 해주는 속성( 해당 디렉토리로 결과 구조를 보냅니다. )
+        "esModuleInterop": true, //import문법을 사용할수있게 해주는 속성    import React from 'react'
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "strict": true, // /* 모든 엄격한 타입-체킹 옵션 활성화 여부 */
+        "baseUrl": ".", //  /* non-absolute한 모듈 이름을 처리할 기준 디렉토리 */
+        "typeRoots": ["./node_modules/@types", "./@types"], //typeRoots를 지정하면 typeRoots 아래에 있는 패키지만 포함
+        "paths": {
+            "@core/*": ["src/core/*"] //@core로 써주면 경로를 현재위치서부터가아닌  src디렉토리안의 core디렉토리부터 시작(../../ 를  최소화할수있다) )'@core/blockchain/block'
+            // "*": ["@types/*"] //core를 제외한 모든경로를  @type에서 시작
+        }
+    },
+    "ts-node": {
+        "files": true,
+        "require": ["tsconfig-paths/register"]
     }
-  },
-  "ts-node": {
-    "files": true,
-    "require": ["tsconfig-paths/register"]
-  }
 }
+
+// 타입스크립트를 작성할 때 어떤 규칙을 설정할 것인지 적는 문서

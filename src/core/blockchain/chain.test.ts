@@ -6,14 +6,15 @@ describe('Chain 함수 체크', () => {
 
     let receivedTx = {
         sender: '03177913a4efcb4593a1889a6b0e5954ae640884adaead26f399a5af56bd81b057',
-        received: '062739667c018b24604c86f54e2b63edbabe10ea',
-        amount: 10,
+        received: '03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6',
+        amount: 30,
         signature: {
-            r: 'b8f9080f7d8e9a32b95cbd74955f8642ce1bf9bae9e2f2bc48ef42c418d6da9',
-            s: 'cf449fc62a0319739a42e7b7adbdeb580aaa47356be39379514c87298073df83',
-            recoveryParam: 0,
+            r: '1f918f8df4fc910ab1bcbe98ba8e624e2160ae97b590ae2ef59d5275962a0f7c',
+            s: '93cf60ed3ed79192e24ef496fdb0e55c59801f36f1812fc1e41673d1f0ea35d',
+            recoveryParam: 1,
         },
     }
+
     it('getChain() 함수 체크', () => {
         console.log(ws.getChain())
     })
@@ -32,6 +33,9 @@ describe('Chain 함수 체크', () => {
         ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
         ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
         ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
+        ws.miningBlock('03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6')
+        ws.miningBlock('03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6')
+        ws.miningBlock('03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6')
 
         // console.log(ws.getChain())
         console.log(ws.getUnspentTxOuts())
@@ -85,8 +89,12 @@ describe('Chain 함수 체크', () => {
     it('sendTransaction 검증', () => {
         try {
             const tx = Wallet.sendTransaction(receivedTx, ws.getUnspentTxOuts())
-            console.log('tx', tx)
+            // console.log('tx', tx)
             //Transaction 내용을 가지고 UTXO최신화하기   .updateUTXO
+            console.log('utxo내용:', ws.getUnspentTxOuts()) //원래내용 //6
+            ws.updateUTXO(tx)
+            ws.appendTransactionPool(tx)
+            console.log('utxo바뀐내용:', ws.getUnspentTxOuts()) //바뀐내용  //7
         } catch (e) {
             if (e instanceof Error) console.log(e.message)
         }

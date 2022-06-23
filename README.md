@@ -58,7 +58,7 @@ export const a = 10
 ```
 
 -   npm install -D tsconfig-paths
-    (tsconfig.json에서 paths설정을 써주기 위한 명령어)
+    (tsconfig.json에서 paths에 적어둔설정을 사용하기 위한 명령어)
 
 -   npx ts-node -r tsconfig-paths/register [파일명]
     (경로에 별칭이 사용된 ts파일을 실행할 수 있다.)
@@ -68,9 +68,19 @@ package.json에 설정해두기
 "dev:ts":"ts-node -r tsconfig-paths/register"
 (npm run dev:ts)
 
+//이명령어로 @core사용한 파일실행
+// npm run dev:ts ./wallet/server.ts //@core때문에
+// npx ts-node -r tsconfig-paths/register ./wallet/server.ts
+
+//@core별칭을 안쓰면 npx ts-node만 써주면 된다
+
+\*test파일을 위한 npx jest명령어를 사용하기위해
+npm install -D ts-jest를 깔아줌
+
 `외부라이브러리가져올때 개빡침`
 
 -   npm i --save-dev @types/express //큰것들은 이거설치
+-   npm i -D @types/express
 
 //작은것들은 머해줄지 안떠서 @types디렉토리에 hex-to-binary 처럼 별칭 설정
 
@@ -84,6 +94,12 @@ package.json에 설정해두기
 -> prettier는 eslint처럼 '코드 구현 방식'이 아닌, 줄 바꿈, 공백, 들여 쓰기 등 에디터에서 '텍스트'를 일관되게 작성되도록 도와주는 것이다.
 
 -   npm install -D eslint prettier eslint-plugin-prettier eslint-config-prettier
+    -->D를 쓰는이유는? package.json에 개발모드(devDependencies)로 저장하기위해---나중에 배포할때 dev 붙은건 설치 안되도록 build 하고 배포할겁니다
+
+--->eslint-config-prettier 는 prettier 의 설정 중 eslint 의 설정과 충돌이 나는 설정들을 비활성화 해주는 라이브러리이다.
+
+--->
+eslint-plugin-prettier는 Prettier의 규칙을 eslint에 적용시킬 수 있게끔 해주는 plugin이다.
 
 # .eslintrc 파일생성
 
@@ -111,6 +127,8 @@ package.json에 설정해두기
 
 설정들가는법
 Ctrl + ,
+--->Format On Save 체크
+---> Default Formatter에서 prettier-code formatter바까주기
 
 객체지향적
 작은것부터 만들면서 큰거를 만들기
@@ -537,6 +555,7 @@ utxo에 담긴 a계정사람에 대한걸 쫙모은다
 그다음 output에 a의 account, amount(1btc), b의 account, amount(3,5,2btc)의 내용이 담기고 output이 만들어짐과 동시에
 또 거래내역이 만들어지고 utxo에 output내용이 담기게 된다
 
+-   마이닝되어야 거래내역이 생기고 utxo도 추가되는거
 -   balance=총액(wallet.ts)
 
 ---
@@ -648,5 +667,5 @@ console.log('123'.repeat(10))
 //123123123123123123123123123123
 
 \*/
-
-console.log console.error
+.concat
+잔액 부적 50 6개

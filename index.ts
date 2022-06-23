@@ -4,6 +4,12 @@ import { P2PServer, Message, MessageType } from './src/serve/p2p'
 import peers from './peer.json'
 import express from 'express' //node js의 라이브러리로 간편하게 웹서버를 구축할수 있게 도와준다
 import { ReceivedTx, Wallet } from '@core/wallet/wallet'
+
+//*from 뒤 스트링은 node_modules 에 설치된 (package.json에 적힌) 라이브러리,import 뒤는 원하는 라이브러리  */
+//(express 라이브러리를 가져올건데  'expres'에서 가져오겟다)
+// const express = require('express')
+// const app=express()
+
 //여기서는  P2P.ts를  import했고 P2P.ts 폴더에서는 웹소켓을 사용하기 위해 websocket라이브러리를 import해서 사용하고 있다
 //지갑서버에서는  사용자가 요청을 했을때만  블럭서버에 요청을 보내고 응답을 받아서 답을 해주는 방식으로 이루어지니까
 //웹소켓통신을 안해도 되지만
@@ -60,7 +66,7 @@ app.use((req, res, next) => {
 })
 
 app.get('/', (req, res) => {
-    res.send('hello?')
+    res.send('hello?') //브라우저 화면에 hello라고 찍힌다
 })
 
 //블록내용보는 api

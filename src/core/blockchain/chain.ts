@@ -8,10 +8,12 @@ import { unspentTxOut } from '@core/transaction/unspentTxOut'
 export class Chain {
     private blockchain: Block[]
     private unspentTxOuts: unspentTxOut[]
+    private transactionPool: ITransaction[]
 
     constructor() {
         this.blockchain = [Block.getGENESIS()]
         this.unspentTxOuts = []
+        this.transactionPool = [] //트랜잭션이 생성될떄마다 여기에 차곡차곡쌓임
     }
 
     public getUnspentTxOuts(): unspentTxOut[] {
@@ -34,6 +36,14 @@ export class Chain {
         return this.blockchain[this.blockchain.length - 1]
     }
 
+    public getTransactionPool(): ITransaction[] {
+        return this.transactionPool
+    }
+
+    public appendTransactionPool(_Transaction: ITransaction): void {
+        this.transactionPool.push(_Transaction)
+    }
+
     public miningBlock(_account: string): Failable<Block, string> {
         //TODO:Transaction 만드는 코드를 넣고
         //TODO:addBlock
@@ -42,7 +52,8 @@ export class Chain {
         const txout: ITxOut = new TxOut(_account, 50)
         const transaction: Transaction = new Transaction([txin], [txout])
         const utxo = transaction.createUTXO()
-        this.appendUTXO(utxo) //[asdf]
+        this.appendUTXO(utxo) //마이닝되어야 거래내역이 생기는건데
+        //여기서 이코드를 실행하면  마이닝을 시도하면 거래내역이 생김
 
         return this.addBlock([transaction])
     }
@@ -96,7 +107,7 @@ export class Chain {
         return { isError: false, value: undefined }
     }
 
-    updateUTXO(_tx: Transaction) {
+    updateUTXO(_tx: Transaction): void {
         // const consumedTxOuts = tx.txIns
         // const newUnspentTxOuts = tx.txOuts
         // const unspentTxOuts: unspentTxOut[] = this.getUnspentTxOuts()
@@ -107,21 +118,21 @@ export class Chain {
         //         return txin.txOutId !== utxo.txOutId && txin.txOutIndex !== utxo.txOutIndex
         //     })
         // })
+        const unspentTxOuts: unspentTxOut[] = this.getUnspentTxOuts()
+        const newUnspentTxOuts = _tx.txOuts.map((txout, index) => {
+            return new unspentTxOut(_tx.hash, index, txout.account, txout.amount)
+        })
 
-        const consumedTxOuts = _tx.txIns
-        const newUnspentTxOuts = _tx.txOuts
-
-        let utxo = this.getUnspentTxOuts()
-
-        consumedTxOuts.reduce((acc: unspentTxOut[], _v) => {
-            utxo = acc.filter((v) => {
-                return v.txOutId !== _v.txOutId
+        this.unspentTxOuts = unspentTxOuts
+            .filter((utxo: unspentTxOut) => {
+                const bool = _tx.txIns.find((txIn: TxIn) => {
+                    return utxo.txOutId === txIn.txOutId && utxo.txOutIndex === txIn.txOutIndex
+                })
+                return !bool //없는건  true, 있는건  false로 반환됨
             })
+            .concat(newUnspentTxOuts) //배열매서드
 
-            return utxo
-        }, utxo)
-
-        return utxo
+        this.appendTransactionPool(_tx) //트랜잭션풀과 utxo는  밀접한 관련이 있다  왜냐 트랜잭션이 생기면 utxo내용도 바뀌기 때문
     }
 
     replaceChain(_receivedChain: Block[]): Failable<undefined, string> {
