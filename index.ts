@@ -167,6 +167,13 @@ app.post('/sendTransaction', (req, res) => {
         const tx = Wallet.sendTransaction(receivedTx, ws.getUnspentTxOuts())
         ws.appendTransactionPool(tx)
         ws.updateUTXO(tx)
+        //브로드캐스트가 들갈거임
+        const message: Message = {
+            //여긴 보내는사람입장 시작
+            type: MessageType.receivedTx,
+            payload: tx,
+        }
+        ws.broadcast(message)
     } catch (e) {
         if (e instanceof Error) console.log(e.message) //에러가 있을경우실행
         //에러중에서도 발생한 에러가 e instanceof Error 이거면   콘솔로 찍어라

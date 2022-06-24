@@ -7,10 +7,10 @@ describe('Chain 함수 체크', () => {
     let receivedTx = {
         sender: '02639e7d159c47211bc81fd33f03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6',
         received: '03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6',
-        amount: 100,
+        amount: 30,
         signature: {
-            r: 'c393e9070b35236dff4fedbca42a9c13c8d913695b71802013e1963acbbd6890',
-            s: '7381dd2aa530c64f0560e14c53c18394fee39f6a96abfb2d19502cf6cd664815',
+            r: '799b9bb260dc1c70640b31551b2053b26eabf8ca8ac4ad9ce3f743a461d22a',
+            s: '59af9c46cb92b862b9cded620469fe346d65949fdc6ec4d8038644a7599605f2',
             recoveryParam: 0,
         },
     }
@@ -36,8 +36,7 @@ describe('Chain 함수 체크', () => {
         ws.miningBlock('03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6')
         ws.miningBlock('03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6')
         ws.miningBlock('03a2c7d8efa5b5b9aae4a5cffc40964a666b9dd6')
-
-        // console.log(ws.getChain())
+        console.log('6번 마이닝하고', ws.getChain())
         console.log(ws.getUnspentTxOuts())
 
         //마이닝블럭 매개변수에 22번쨰부터 27번쨰꺼까지의 account를 인자로 넣어줘서 그걸돌려서 나온값들이다
@@ -91,11 +90,13 @@ describe('Chain 함수 체크', () => {
             const tx = Wallet.sendTransaction(receivedTx, ws.getUnspentTxOuts())
             // console.log('tx', tx)
             //Transaction 내용을 가지고 UTXO최신화하기   .updateUTXO
-            console.log('utxo내용:', ws.getUnspentTxOuts()) //원래내용 //6(50)
-            ws.appendTransactionPool(tx)
-            ws.updateUTXO(tx) //이함수에서 -50 +20,30 해주니까 7개찍히고
-            console.log('utxo바뀐내용:', ws.getUnspentTxOuts()) //바뀐내용  //7(-50,+20,+30)
-            console.log('pool', ws.getTransactionPool())
+            console.log('utxo내용:', ws.getUnspentTxOuts()) //원래내용 //위에서 마이닝6번 해준거에대한 utxo 6(50)
+            console.log('tx', tx)
+            console.log('pool---0', ws.getTransactionPool()) //거래한게 없으니 거래내역0개
+            ws.appendTransactionPool(tx) //여기서 억지로 풀에 거래내역을 넣어줌
+            console.log('pool---1', ws.getTransactionPool()) //이제 풀을 찍어보니 거래내역1개
+            ws.updateUTXO(tx) //여기서 거래한 내용으로 utxo를 업데이트 // -50 +20,30 해주니까 utxo내용을 6개-->7개
+            console.log('utxo바뀐내용:', ws.getUnspentTxOuts()) //위코드에서 바꿔준 utxo가 찍힘  //7(-50,+20,+30)
         } catch (e) {
             if (e instanceof Error) console.log(e.message)
         }
@@ -104,10 +105,11 @@ describe('Chain 함수 체크', () => {
     it('채굴테스트', () => {
         try {
             //마이닝전 TxPool :1개
-            ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057')
-            console.log('0', ws.getTransactionPool()) // //마이닝전 TxPool :0개
-            console.log('7', ws.getChain()) //block 7개
-            console.log('2', ws.getChain()[6]) //block data->transaction 2개
+            console.log('-1', ws.getTransactionPool()) //아까 억지로 넣어준 거래내역 1개
+            ws.miningBlock('0e5954ae640884adaead26f399a5af56bd81b057') //위거래내역으로 마이닝 진행
+            console.log('0', ws.getTransactionPool()) // 위거래내역으로  마이닝진행했으니  TxPool :0개
+            console.log('7', ws.getChain()) //위에서 마이닝6번과 지금 위에서 마이닝한거 1개 해서 제네시스블럭안치고 block 7개
+            console.log('2', ws.getChain()[7]) //7번째블럭을 확인하니까 block data->transaction 2개(내가억지로넣어준 거래내역 1개+서버에서 넣어준 나의 채굴내역)
         } catch (e) {}
     })
 

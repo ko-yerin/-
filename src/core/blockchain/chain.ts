@@ -84,11 +84,11 @@ export class Chain {
         const txin: ITxIn = new TxIn('', this.getLatestBlock().height + 1)
         const txout: ITxOut = new TxOut(_account, 50)
         const transaction: Transaction = new Transaction([txin], [txout]) //여기까지가 코인베이스 내용
-        const utxo = transaction.createUTXO()
-        this.appendUTXO(utxo) //마이닝되어야 거래내역이 생기는건데
-        //여기서 이코드를 실행하면  마이닝을 시도하면 거래내역이 생김
-
-        return this.addBlock([transaction, ...this.getTransactionPool()])
+        // const utxo = transaction.createUTXO()
+        // this.appendUTXO(utxo) //마이닝되어야 거래내역이 생기는건데
+        // //여기서 이코드를 실행하면  마이닝을 시도하면 거래내역이 생김
+        // // console.log('마이닝 하고 T-pool', ...this.getTransactionPool())
+        return this.addBlock([transaction, ...this.getTransactionPool()]) //이코드에서 블럭에 거래내역을 넣어서 마이닝하는?
     }
 
     public addBlock(_data: ITransaction[]): Failable<Block, string> {
@@ -103,6 +103,11 @@ export class Chain {
         if (isValid.isError) return { isError: true, error: isValid.error }
 
         this.blockchain.push(newBlock)
+
+        newBlock.data.forEach((_tx: ITransaction) => {
+            this.updateUTXO(_tx)
+        })
+
         this.updateTransactionPool(newBlock)
 
         //block.data.transactions  블럭안에 데이터안에 트랜잭션내용들과
@@ -167,7 +172,7 @@ export class Chain {
             return new unspentTxOut(_tx.hash, index, txout.account, txout.amount)
         })
 
-        this.unspentTxOuts = latestUTXO //이제 50을뺴고 30,20을 넣어주어야된다
+        const tmp = latestUTXO //이제 50을뺴고 30,20을 넣어주어야된다
             .filter((utxo: unspentTxOut) => {
                 const isSameUTXO = _tx.txIns.find((txIn: TxIn) => {
                     return utxo.txOutId === txIn.txOutId && utxo.txOutIndex === txIn.txOutIndex
@@ -184,7 +189,16 @@ export class Chain {
         //*173번쨰 코드를 보면 전부찾아야 되는데 find로 찾으면  만족하는 맨 첫번쨰만 찾아지는 데 어쩌냐
         //filter로 게속 전부찾을 떄까지 돌리니까 상관없다
 
-        this.appendTransactionPool(_tx) //위에 새로운 거래내역이 생기고 utxo가 생기고 그 거래내역이  transaction pool에 추가됨
+        let unspentTmp: unspentTxOut[] = []
+        const result = tmp.reduce((acc, utxo) => {
+            const find = acc.find(({ txOutId, txOutIndex }) => {
+                return txOutId === utxo.txOutId && txOutIndex === utxo.txOutIndex
+            })
+            if (!find) acc.push(utxo) //못찾았을때 즉 값이 undefinde일때 트루
+            return acc
+        }, unspentTmp)
+
+        this.unspentTxOuts = result //위에 새로운 거래내역이 생기고 utxo가 생기고 그 거래내역이  transaction pool에 추가됨
         //트랜잭션풀과 utxo는  밀접한 관련이 있다  왜냐 트랜잭션이 생기면 utxo내용도 바뀌기 때문
     }
 

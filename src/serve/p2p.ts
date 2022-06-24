@@ -5,6 +5,7 @@ export enum MessageType { //type이 아닌 데이터값을 정해줄때   enum�
     latest_block = 0,
     all_block = 1,
     receivedChain = 2,
+    receivedTx = 3,
 }
 
 // interface MessageType2 {  //type을 정해줄때   interface를  사용한다
@@ -71,6 +72,12 @@ export class P2PServer extends Chain {
 
     messageHandler(socket: WebSocket) {
         const callback = (data: string) => {
+            // export interface Message{
+            //     type:MessageType
+            //     payload:any
+            // }
+            //data에 위 객체가 들가면됨
+
             // console.log(data) //buffer내용이 찍힘
             const result: Message = P2PServer.dataParse<Message>(data)
             const send = this.send(socket)
@@ -109,6 +116,28 @@ export class P2PServer extends Chain {
                     this.handleChainResponse(receivedChain)
                     //체인바꿔주는 코드
                     //긴체인 선택하기
+                    break
+                }
+
+                case MessageType.receivedTx: {
+                    const receivedTransaction: ITransaction = result.payload
+                    if (receivedTransaction === null) break
+
+                    const withTransaction = this.getTransactionPool().find((_tx: ITransaction) => {
+                        return _tx.hash === receivedTransaction.hash
+                    })
+
+                    if (!withTransaction) {
+                        //받은트랜잭션 내용이 내 트랜잭션풀에 없다면
+                        this.appendTransactionPool(receivedTransaction) //내풀에 넣어주면됨
+                    }
+
+                    const message: Message = {
+                        type: MessageType.receivedTx,
+                        payload: receivedTransaction,
+                    }
+                    this.broadcast(message) //받는사람의 코드는 끗
+
                     break
                 }
             }
