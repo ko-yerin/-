@@ -26,6 +26,7 @@ export class BlockHeader implements IBlockHeader {
 }
 
 export class Block extends BlockHeader implements IBlock {
+    //1
     public hash: string
     public merkleRoot: string
     public nonce: number
@@ -71,12 +72,31 @@ export class Block extends BlockHeader implements IBlock {
 
     public static generateBlock(_previousBlock: Block, _data: ITransaction[], _adjustmentBlock: Block): Block {
         const generateBlock = new Block(_previousBlock, _data, _adjustmentBlock)
-        // TODO : newBlock 은 마이닝이 완료된 블럭
+        //2
+        //generateBlock매서드 안에서 Block객체를 생성하는데 변수 generateBlock에 담아주었다
+        // super(_previousBlock) // BlockHeader 자식의 생성자를 참조한다.
+
+        // const merkleRoot = Block.getMerkleRoot(_data)
+        // this.merkleRoot = merkleRoot
+        // this.hash = Block.createBlockHash(this)
+        // this.nonce = 0
+        // this.difficulty = Block.getDifficulty(this, _adjustmentBlock, _previousBlock)
+        // this.data = _data
+
+        //근데 아직 마이닝은 안된상태라 nonce값을 통해서 hash값을  구해야된다 (=마이닝)
+
         const newBlock = Block.findBlock(generateBlock)
-        return newBlock
-    }
+        //findBlock매서드에 인자값으로  generateBlock(블럭을 통해 생성된 객체)을 넣어주었고
+        //findBlock매서드를 통해 마이닝을 해주었고 그 return값을 newBlock에 담아준것이다
+        //즉 generateBlock을 통해서는  아직 nonce값을 구하지 않은 블럭객체를 생성
+        //그 generateBlock을 가지고 findBlock에서 논스값을 구하고 해쉬값을 구해서 마이닝 진행
+        //즉 newBlock 은 마이닝이 완료된 블럭
+        return newBlock //generateBlock매서드에서 newBlock통해나온 리턴
+    } //??export는  식을 내보내는거 /  return은  답을 내보내는거
 
     public static findBlock(_generateBlock: Block): Block {
+        //3
+        //difficulty에 따른 nonce값을 구하고 hash값 변경
         // 마이닝 작업
         let hash: string
         let nonce: number = 0
